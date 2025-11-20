@@ -1,5 +1,5 @@
 """
-LLM Integration - Interface to Claude/GPT for natural language explanations
+LLM Integration - Interface to Claude/GPT/Ollama for natural language explanations
 """
 
 import os
@@ -12,32 +12,40 @@ load_dotenv()
 class LLMIntegration:
     """
     Integration with Large Language Models for generating chess explanations.
+    Supports: Anthropic Claude, OpenAI GPT, and Ollama (free, local).
     """
 
     def __init__(
         self,
         api_key: Optional[str] = None,
         model: Optional[str] = None,
-        provider: str = "anthropic",
+        provider: str = "ollama",  # Changed default to free option
     ):
         """
         Initialize LLM integration.
 
         Args:
-            api_key: API key for LLM service (defaults to env variable)
+            api_key: API key for LLM service (not needed for Ollama)
             model: Model to use (defaults to env variable)
-            provider: "anthropic" or "openai"
+            provider: "ollama" (free), "anthropic", or "openai"
         """
         self.provider = provider
-        self.api_key = api_key or self._get_api_key()
-        self.model = model or os.getenv("AI_MODEL", "claude-3-5-sonnet-20241022")
-        self.client = None
+        self.api_key = api_key or self._get_api_key() if provider != "ollama" else None
 
+        # Set default model based on provider
+        if provider == "ollama":
+            self.model = model or os.getenv("AI_MODEL", "llama3.2:3b")
+        else:
+            self.model = model or os.getenv("AI_MODEL", "claude-3-5-sonnet-20241022")
+
+        self.client = None
         self._initialize_client()
 
     def _get_api_key(self) -> str:
         """Get API key from environment."""
-        if self.provider == "anthropic":
+        if self.provider == "ollama":
+            return None  # Ollama doesn't need API key
+        elif self.provider == "anthropic":
             key = os.getenv("ANTHROPIC_API_KEY")
             if not key:
                 raise ValueError("ANTHROPIC_API_KEY not set in environment")
@@ -49,7 +57,15 @@ class LLMIntegration:
 
     def _initialize_client(self):
         """Initialize the LLM client."""
-        if self.provider == "anthropic":
+        if self.provider == "ollama":
+            try:
+                from .ollama_client import OllamaClient
+                self.client = OllamaClient(model=self.model)
+            except ImportError:
+                raise ImportError(
+                    "ollama_client not found. Make sure ollama_client.py is in the ai module."
+                )
+        elif self.provider == "anthropic":
             try:
                 from anthropic import Anthropic
                 self.client = Anthropic(api_key=self.api_key)
@@ -57,7 +73,7 @@ class LLMIntegration:
                 raise ImportError(
                     "anthropic package not installed. Run: pip install anthropic"
                 )
-        else:
+        else:  # openai
             try:
                 from openai import OpenAI
                 self.client = OpenAI(api_key=self.api_key)
@@ -257,7 +273,13 @@ Be encouraging and educational.
             LLM response text
         """
         try:
-            if self.provider == "anthropic":
+            if self.provider == "ollama":
+                # Ollama local generation
+                from .ollama_client import KidFriendlyPrompts
+                system_prompt = KidFriendlyPrompts.explain_position("7-12")
+                return self.client.generate(prompt, system_prompt=system_prompt)
+
+            elif self.provider == "anthropic":
                 response = self.client.messages.create(
                     model=self.model,
                     max_tokens=int(os.getenv("AI_MAX_TOKENS", "1024")),
@@ -265,6 +287,7 @@ Be encouraging and educational.
                     messages=[{"role": "user", "content": prompt}],
                 )
                 return response.content[0].text
+
             else:  # OpenAI
                 response = self.client.chat.completions.create(
                     model=self.model,
