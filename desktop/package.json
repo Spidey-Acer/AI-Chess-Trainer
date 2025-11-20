@@ -43,7 +43,7 @@
     "files": [
       "main.js",
       "preload.js",
-      "renderer/**/*",
+      "renderer-app/build/**/*",
       "assets/**/*"
     ],
     "extraResources": [

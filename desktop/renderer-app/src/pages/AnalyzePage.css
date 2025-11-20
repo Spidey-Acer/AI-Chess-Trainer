@@ -1,0 +1,131 @@
+.analyze-page {
+  padding: 20px;
+  color: white;
+}
+
+.analyze-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.analyze-header h2 {
+  color: #667eea;
+  margin: 0;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 10px;
+}
+
+.mode-selector button {
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mode-selector button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mode-selector button.active {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+.analyze-content {
+  display: flex;
+  gap: 30px;
+}
+
+.board-section {
+  flex-shrink: 0;
+}
+
+.position-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.position-controls button {
+  padding: 12px 24px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.position-controls button:hover:not(:disabled) {
+  background: #5568d3;
+}
+
+.position-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.analysis-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.pgn-section {
+  flex: 1;
+}
+
+.pgn-section textarea {
+  width: 100%;
+  min-height: 400px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 15px;
+  font-family: monospace;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.pgn-section textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.pgn-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.pgn-controls button {
+  padding: 12px 24px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.pgn-controls button:hover:not(:disabled) {
+  background: #5568d3;
+}
+
+.pgn-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

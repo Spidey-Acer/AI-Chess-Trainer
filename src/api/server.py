@@ -438,6 +438,45 @@ def import_pgn():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/ollama/status', methods=['GET'])
+def ollama_status():
+    """Get Ollama status."""
+    try:
+        from src.api.ollama_manager import OllamaManager
+        manager = OllamaManager()
+
+        return jsonify({
+            'running': manager.is_running(),
+            'models': manager.list_models() if manager.is_running() else []
+        })
+    except Exception as e:
+        logger.error(f"Error checking Ollama status: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/ollama/pull', methods=['POST'])
+def ollama_pull():
+    """Pull an Ollama model."""
+    try:
+        data = request.json
+        model_name = data.get('model')
+
+        if not model_name:
+            return jsonify({'error': 'Model name required'}), 400
+
+        from src.api.ollama_manager import OllamaManager
+        manager = OllamaManager()
+
+        if not manager.is_running():
+            return jsonify({'error': 'Ollama is not running'}), 503
+
+        success = manager.pull_model(model_name)
+        return jsonify({'success': success})
+    except Exception as e:
+        logger.error(f"Error pulling model: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+
 @app.errorhandler(404)
 def not_found(error):
     """Handle 404 errors."""

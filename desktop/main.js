@@ -194,13 +194,13 @@ function createMainWindow() {
   if (isDevelopment) {
     // In development, load from React dev server if running
     mainWindow.loadURL('http://localhost:3000').catch(() => {
-      // Fallback to static HTML if React dev server not running
-      mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+      // Fallback to React build if dev server not running
+      mainWindow.loadFile(path.join(__dirname, 'renderer-app', 'build', 'index.html'));
     });
     mainWindow.webContents.openDevTools();
   } else {
-    // In production, load static build
-    mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+    // In production, load React build
+    mainWindow.loadFile(path.join(__dirname, 'renderer-app', 'build', 'index.html'));
   }
 
   // Show window when ready
