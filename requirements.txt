@@ -10,6 +10,10 @@ anthropic==0.39.0
 click==8.1.7
 rich==13.7.0  # For beautiful terminal output
 
+# Web API (for desktop app)
+flask==3.0.0
+flask-cors==4.0.0
+
 # Data handling
 pandas==2.2.0
 numpy==1.26.4
