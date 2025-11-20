@@ -1,0 +1,58 @@
+# AI Chess Trainer Configuration
+
+# Chess Engine Settings
+engine:
+  path: /usr/local/bin/stockfish  # Path to Stockfish binary
+  depth: 20  # Default analysis depth
+  multipv: 3  # Number of principal variations to analyze
+  threads: 4  # Number of threads for analysis
+  hash: 256  # Hash table size in MB
+
+# Analysis Settings
+analysis:
+  blunder_threshold: 300  # Centipawns
+  mistake_threshold: 100  # Centipawns
+  inaccuracy_threshold: 50  # Centipawns
+  critical_position_threshold: 200  # Centipawns
+  time_per_move: 1.0  # Seconds
+
+# AI Settings
+ai:
+  provider: anthropic  # 'anthropic' or 'openai'
+  model: claude-3-5-sonnet-20241022
+  temperature: 0.7
+  max_tokens: 1024
+
+# Database Settings
+database:
+  path: ./data/chess_trainer.db
+  backup_enabled: true
+  backup_interval: 86400  # Seconds (24 hours)
+
+# Training Settings
+training:
+  default_session_time: 1800  # Seconds (30 minutes)
+  puzzle_difficulty: 1500  # Starting difficulty
+  adaptive_difficulty: true
+  positions_per_session: 10
+
+# Logging Settings
+logging:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file: ./logs/chess_trainer.log
+  max_size: 10485760  # 10 MB
+  backup_count: 5
+
+# UI Settings
+ui:
+  theme: dark  # 'dark' or 'light'
+  board_theme: classic
+  show_coordinates: true
+  animation_speed: medium
+
+# Data Directories
+directories:
+  games: ./data/sample_games
+  openings: ./data/openings
+  puzzles: ./data/puzzles
+  exports: ./data/exports
