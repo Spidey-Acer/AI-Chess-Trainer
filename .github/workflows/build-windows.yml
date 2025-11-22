@@ -1,0 +1,116 @@
+name: Build Windows Installer
+
+on:
+  push:
+    branches:
+      - main
+      - claude/*
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Bundle Python backend with PyInstaller
+        run: |
+          pyinstaller server.spec --clean --noconfirm
+        shell: bash
+
+      - name: Verify Python bundle
+        run: |
+          dir dist\server
+          echo "Python backend bundled successfully"
+        shell: cmd
+
+      - name: Install React app dependencies
+        working-directory: desktop/renderer-app
+        run: npm ci
+
+      - name: Build React app
+        working-directory: desktop/renderer-app
+        run: npm run build
+
+      - name: Verify React build
+        run: |
+          dir desktop\renderer-app\build
+          echo "React app built successfully"
+        shell: cmd
+
+      - name: Install desktop app dependencies
+        working-directory: desktop
+        run: npm ci
+
+      - name: Build Windows installer
+        working-directory: desktop
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List build artifacts
+        run: |
+          echo "Build artifacts:"
+          dir desktop\dist
+        shell: cmd
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: |
+            desktop/dist/*.exe
+            desktop/dist/latest.yml
+          retention-days: 30
+
+      - name: Upload unpacked build
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-unpacked
+          path: desktop/dist/win-unpacked
+          retention-days: 7
+
+      - name: Create Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            desktop/dist/*.exe
+            desktop/dist/latest.yml
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release notes
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "Windows installer created and uploaded to release!"
+          echo "Download: AI Chess Trainer Setup ${{ github.ref_name }}.exe"

@@ -1,0 +1,194 @@
+name: Build All Platforms
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Build Python backend
+        run: |
+          pip install -r requirements.txt pyinstaller
+          pyinstaller server.spec --clean --noconfirm
+
+      - name: Build React app
+        run: |
+          cd desktop/renderer-app
+          npm ci
+          npm run build
+
+      - name: Build Windows installer
+        run: |
+          cd desktop
+          npm ci
+          npm run build:win
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: desktop/dist/*.exe
+
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Build Python backend
+        run: |
+          pip install -r requirements.txt pyinstaller
+          pyinstaller server.spec --clean --noconfirm
+
+      - name: Build React app
+        run: |
+          cd desktop/renderer-app
+          npm ci
+          npm run build
+
+      - name: Build Linux packages
+        run: |
+          cd desktop
+          npm ci
+          npm run build:linux
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-appimage
+          path: desktop/dist/*.AppImage
+
+      - name: Upload .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-deb
+          path: desktop/dist/*.deb
+
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Build Python backend
+        run: |
+          pip install -r requirements.txt pyinstaller
+          pyinstaller server.spec --clean --noconfirm
+
+      - name: Build React app
+        run: |
+          cd desktop/renderer-app
+          npm ci
+          npm run build
+
+      - name: Build macOS installer
+        run: |
+          cd desktop
+          npm ci
+          npm run build:mac
+
+      - name: Upload .dmg
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg
+          path: desktop/dist/*.dmg
+
+  create-release:
+    name: Create Release
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure
+        run: ls -R artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/windows-installer/*.exe
+            artifacts/linux-appimage/*.AppImage
+            artifacts/linux-deb/*.deb
+            artifacts/macos-dmg/*.dmg
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## Downloads
+
+            ### Windows
+            - **AI Chess Trainer Setup.exe** - Full installer with NSIS
+
+            ### Linux
+            - **AI Chess Trainer.AppImage** - Portable (all distros)
+            - **ai-chess-trainer-desktop.deb** - Debian/Ubuntu package
+
+            ### macOS
+            - **AI Chess Trainer.dmg** - macOS installer
+
+            ## Installation
+
+            See [README.md](https://github.com/${{ github.repository }}/blob/main/README.md) for installation instructions.
+
+            ## What's Changed
+
+            Full changelog: https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

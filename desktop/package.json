@@ -69,7 +69,9 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "assets/icon.ico"
+      "icon": "assets/icon.ico",
+      "signingHashAlgorithms": ["sha256"],
+      "signDlls": false
     },
     "mac": {
       "target": [

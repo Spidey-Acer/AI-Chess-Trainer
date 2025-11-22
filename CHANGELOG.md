@@ -7,14 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### In Progress - CI/CD Infrastructure
+- GitHub Actions workflows for automated builds
+- Windows builds via GitHub Actions (no Windows PC needed)
+- Multi-platform builds (Win/Mac/Linux) via cloud
+
 ### Future Enhancements
-- Windows installer (.exe via NSIS)
-- macOS installer (.dmg)
 - Custom application icons
 - Auto-updater integration
 - Code signing for macOS/Windows
 
 ## [0.3.0] - 2025-11-22 (Week 4 Complete - 100%)
+
+### Added - CI/CD & Windows Infrastructure
+- **GitHub Actions Workflows**: Automated building for all platforms
+  - `build-windows.yml`: Windows-only builds (triggered on push)
+  - `build-all-platforms.yml`: Win/Mac/Linux builds (triggered on tags)
+- **Windows Build Guide**: Comprehensive WINDOWS_BUILD_GUIDE.md
+- **Quick Start Guide**: QUICK_START_WINDOWS.md for fast Windows builds
+- **Automated Releases**: Auto-create releases with installers on git tags
+- **Artifact Uploads**: Build artifacts saved for 30 days
+- **Windows Configuration**: NSIS installer settings in package.json
 
 ### Added - Packaging & Distribution
 - **PyInstaller Bundling**: Complete Python backend bundling (140MB)

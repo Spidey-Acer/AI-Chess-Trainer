@@ -156,12 +156,24 @@ See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the complete roadmap.
 - ✅ Production build (169KB gzipped)
 - ✅ PyInstaller backend bundle (140MB)
 - ✅ Linux installers (AppImage + .deb)
+- ✅ Windows build infrastructure + GitHub Actions
 
-**Available Now:**
+**How to Get Windows Installer:**
+
+**Option 1: Automated Build (Recommended - No Windows PC Needed!)**
+- Push code to GitHub
+- GitHub Actions automatically builds Windows .exe
+- Download from Actions artifacts or Releases
+- See [QUICK_START_WINDOWS.md](QUICK_START_WINDOWS.md)
+
+**Option 2: Build Locally on Windows PC**
+- See [WINDOWS_BUILD_GUIDE.md](WINDOWS_BUILD_GUIDE.md)
+- Estimated time: 5-10 minutes
+
+**Also Available:**
 - Linux AppImage (163MB portable)
 - Debian package (116MB .deb)
-- Complete source code
-- Build infrastructure for Win/Mac
+- macOS .dmg (via GitHub Actions)
 
 **Next Steps:**
 - Windows installer (requires Windows machine)
