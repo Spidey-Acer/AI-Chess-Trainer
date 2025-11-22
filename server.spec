@@ -24,6 +24,8 @@ hiddenimports = [
     'dotenv',
     'tqdm',
     'dateutil',
+    'cffi',
+    '_cffi_backend',
 ]
 
 # Data files to include
@@ -33,8 +35,25 @@ datas = [
     ('.env.example', '.'),
 ]
 
-# Binaries (will be added at build time)
+# Binaries to include
+# NOTE: Before building, download Stockfish from https://stockfishchess.org/download/
+# and place the binary in engines/ directory:
+#   - Windows: engines/stockfish.exe
+#   - macOS/Linux: engines/stockfish
+#
+# Example binaries configuration:
+# binaries = [
+#     ('engines/stockfish.exe', 'engines') if os.name == 'nt' else ('engines/stockfish', 'engines'),
+# ]
 binaries = []
+
+# Try to include Stockfish if available
+if os.path.exists('engines'):
+    import glob
+    stockfish_files = glob.glob('engines/stockfish*')
+    for sf in stockfish_files:
+        binaries.append((sf, 'engines'))
+        print(f"Including Stockfish binary: {sf}")
 
 a = Analysis(
     ['src/api/server.py'],

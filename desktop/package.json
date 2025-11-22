@@ -22,7 +22,11 @@
     "kids",
     "offline"
   ],
-  "author": "AI Chess Trainer Team",
+  "author": {
+    "name": "AI Chess Trainer Team",
+    "email": "contact@aichesstrainer.com"
+  },
+  "homepage": "https://github.com/Spidey-Acer/AI-Chess-Trainer",
   "license": "MIT",
   "devDependencies": {
     "electron": "^28.0.0",
@@ -89,7 +93,8 @@
         }
       ],
       "icon": "assets/icon.png",
-      "category": "Education"
+      "category": "Education",
+      "maintainer": "AI Chess Trainer Team <contact@aichesstrainer.com>"
     },
     "nsis": {
       "oneClick": false,
